@@ -5,7 +5,7 @@ import os
 
 FILENAME = "chat_store.json"
 
-def load_conversation():
+def load_conversations():
 	if os.path.exists(FILENAME):
 		with open(FILENAME, "r", encoding="utf-8") as file:
 			return json.load(file)
@@ -22,9 +22,9 @@ def create_new_conversation():
 		"messages":[]
 	}
 
-def add_msg(chat_store, user_msg, bot_msg):
-	chat_store.append({
-		"data": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-		"user": user_msg,
-		"furiabot": bot_msg
+def add_message(conversation, role, content):
+    conversation["messages"].append({
+		"role": role,
+		"content": content,
+		"timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 	})
