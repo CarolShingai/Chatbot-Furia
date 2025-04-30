@@ -1,16 +1,10 @@
-from dotenv import load_dotenv
-import os
 from groq import Groq
-
-# Get saved Key
-load_dotenv()
-
-# initiate Groq client
-client = Groq(api_key=os.environ.get("GROP_KEY"),)
+from core.client import get_client
 
 # logic of chatbot
-def send_mensage(mensage, list_msg=[]):
-    list_msg.append()
+client = get_client();
+
+def send_mensage(mensage: str) -> str:
     response = client.chat.completions.create(
         model ="llama3-8b-8192",
         messages = [
@@ -26,10 +20,3 @@ def send_mensage(mensage, list_msg=[]):
     return response.choices[0].message.content
 
 # chatbot loop
-while True:
-    text = input("Escreva aqui sua mensagem para o FURIABOT: ")
-    if text.lower() == "sair":
-        break
-    else:
-        response = send_mensage(text)
-        print("FURIABOT:", response)
