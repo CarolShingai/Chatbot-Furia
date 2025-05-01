@@ -54,8 +54,8 @@ def main():
         #     add_message(conversation, "user", user_input)
         #     add_message(conversation, "assistant", furia_reply)
         #     continue
-        
-        print("FURIABOT:", furia.get_furia_info())
+
+        # print("FURIABOT:", furia.get_furia_info())
         history = [{"role": msg["role"], "content": msg["content"]} for msg in conversation["messages"]]
         response = send_message(history, user_input)
         print("FURIABOT:", response)

@@ -11,12 +11,15 @@ class FuriaTeamInfo:
         self.base_url = "https://api.pandascore.co"
         self.headers = {"Authorization": f"Bearer {self.token}"}
         self.team_id = None
-    
+
+
+
+
     def search_furia_team(self, game="csgo"):
         if not game:
             game = "csgo"
         page = 1
-        while True:
+        while page < 11:
             endpoint = f"/{game}/teams?page={page}"
             try:
                 response=requests.get(self.base_url + endpoint, headers=self.headers)
@@ -34,7 +37,7 @@ class FuriaTeamInfo:
                 return None
         print("❌ A FURIA não foi encontrada após buscar todas as páginas.")
         return None
-    
+
     def get_furia_players(self):
         if not self.team_id:
             self.search_furia_team()
@@ -47,7 +50,7 @@ class FuriaTeamInfo:
         except requests.exceptions.RequestException as e:
             print(f"Erro ao buscar jogadores da FURIA: {e}")
             return []
-            
+
     def get_furia_info(self, game="csgo"):
         """Retorna info geral e lista de jogadores"""
         team = self.search_furia_team(game=game)
@@ -81,7 +84,7 @@ def get_upcoming_matches(game="csgo", team="FURIA"):
         game = "csgo"
     endpoint = f"/{game}/matches/upcoming"
     headers = {"Authorization": f"Bearer {PANDASCORE_TOKEN}"}
-    try: 
+    try:
         response = requests.get(BASE_URL + endpoint, headers=headers)
         response.raise_for_status()
         matches = response.json()
