@@ -1,8 +1,8 @@
 from core.games import GAME_SLUGS
 from core.chatbot import send_message
-from core.storage import (
+from core.chat_storage import (
     load_conversations, save_conversation, create_new_conversation, add_message)
-from core.esports import *
+from core.firebase_fetch_data import initialize_furia_data
 
 def choose_conversation(conversations):
     if not conversations:
@@ -36,7 +36,7 @@ def handle_exit(input_lower, conversation, conversations):
     return False
 
 def main():
-    furia = FuriaTeamInfo()
+    initialize_furia_data()
     conversations = load_conversations()
     conversation = choose_conversation(conversations)
     print("Bem-vindo ao FURIABOT! Digite 'sair' para encerrar.\n")
@@ -47,21 +47,18 @@ def main():
         game_slug = detect_game_from_input(user_input)
         if handle_exit(input_lower ,conversation, conversations):
             break
-        # if is_about_matches:
-        #     matches = get_upcoming_matches(game=game_slug)
-        #     furia_reply = build_furia_match_response(game_slug)
-        #     print("FURIABOT:", furia_reply)
-        #     add_message(conversation, "user", user_input)
-        #     add_message(conversation, "assistant", furia_reply)
-        #     continue
-
-        # print("FURIABOT:", furia.get_furia_info())
         history = [{"role": msg["role"], "content": msg["content"]} for msg in conversation["messages"]]
         response = send_message(history, user_input)
         print("FURIABOT:", response)
         add_message(conversation, "user", user_input)
         add_message(conversation, "assistant", response)
 
+# furia = FuriaTeamInfo()
+# team_data = furia.get_team_furia_id()
+# players = furia.get_furia_players()
+
+# save_team_to_firebase(team_data)
+# save_players_to_firebase(players)
 
 if __name__ == "__main__":
     main()
