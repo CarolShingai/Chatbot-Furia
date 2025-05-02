@@ -6,10 +6,11 @@ import os
 FILENAME = "chat_store.json"
 
 def load_conversations():
-	if os.path.exists(FILENAME):
-		with open(FILENAME, "r", encoding="utf-8") as file:
-			return json.load(file)
-	return []
+    path = "/nfs/homes/cshingai/furia/chat_store.json"
+    if os.path.exists(path) and os.path.getsize(path) > 0:
+        with open(path, 'r') as file:
+            return json.load(file)
+    return []
 
 def save_conversation(chat_store, filename="chat_store.json"):
 	with open("chat_store.json", "w", encoding="utf-8") as file:

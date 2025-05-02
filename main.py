@@ -43,8 +43,6 @@ def main():
     while True:
         user_input = input("Escreva aqui sua mensagem para o FURIABOT: ")
         input_lower = user_input.lower()
-        is_about_matches = any(word in input_lower for word in ["partidas", "partida", "jogo", "jogos"])
-        game_slug = detect_game_from_input(user_input)
         if handle_exit(input_lower ,conversation, conversations):
             break
         history = [{"role": msg["role"], "content": msg["content"]} for msg in conversation["messages"]]
@@ -52,13 +50,6 @@ def main():
         print("FURIABOT:", response)
         add_message(conversation, "user", user_input)
         add_message(conversation, "assistant", response)
-
-# furia = FuriaTeamInfo()
-# team_data = furia.get_team_furia_id()
-# players = furia.get_furia_players()
-
-# save_team_to_firebase(team_data)
-# save_players_to_firebase(players)
 
 if __name__ == "__main__":
     main()

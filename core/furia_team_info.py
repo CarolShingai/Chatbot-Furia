@@ -3,7 +3,7 @@ import requests
 from datetime import datetime
 from dotenv import load_dotenv
 
-load_dotenv()
+# load_dotenv()
 
 class FuriaTeamInfo:
     def __init__(self):
@@ -28,7 +28,7 @@ class FuriaTeamInfo:
         except Exception as e:
             print(f"Erro de conexão: {str(e)}")
             return None
-        
+
     def get_team_furia_id(self):
         params = {"filter[slug]": "furia"}
         team_data = self.make_request("csgo/teams", params)
@@ -39,12 +39,12 @@ class FuriaTeamInfo:
             else:
                 self.players = []
         return team_data
-    
+
     def get_furia_players(self):
         if not self.players:
             self.get_team_furia_id()
         return self.players
-        
+
     def get_upcomin_matches(self, limit=5):
         params = {
             "filter[opponent_id]": self.team_id,
@@ -52,8 +52,8 @@ class FuriaTeamInfo:
             }
         if not self.team_id:
             self.get_team_furia_id()
-        return self.make_request("csgo/matches/upcoming", params)      
-    
+        return self.make_request("csgo/matches/upcoming", params)
+
     def get_past_matches(self, page=1, per_page=10):
         params = {
             "filter[opponent_id]": self.team_id,
@@ -64,7 +64,7 @@ class FuriaTeamInfo:
         if not self.team_id:
             self.get_team_furia_id()
         return self.make_request("csgo/matches/past", params)
-    
+
     def get_live_matches(self):
         params = {"filter[opponent_id]": self.team_id}
         if not self.team_id:
@@ -73,9 +73,9 @@ class FuriaTeamInfo:
 
     def get_player_stats(self, player_id):
         return self.make_request(f"csgo/players/{player_id}/stats")
-    
+
     def get_tournamet_results(self, tournament_id):
         params = {"filter[team_id]": self.team_id}
         if not self.team_id:
             self.get_team_furia_id()
-        return self.make_request("csgo/tournaments/{tournament_id}/matches", params)    
+        return self.make_request("csgo/tournaments/{tournament_id}/matches", params)
