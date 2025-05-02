@@ -6,73 +6,48 @@
 	<title>FURIABOT</title>
 	<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FURIABOT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 <body class="bg-[#212121] text-white h-screen flex flex-col">
-
-	<!-- Header -->
-	<header class="bg-gray-800 p-4 shadow-md">
-	  <h1 class="text-xl font-bold">FURIABOT</h1>
+	<header class="p-4">
+		<h1 class="text-xl font-bold">FURIABOT</h1>
 	</header>
 
 	<!-- Container principal -->
-	<div class="flex flex-col flex-1 overflow-hidden">
+	<div class="flex flex-col flex-1 justify-center">
+		<!-- Área de mensagens (inicialmente vazia) -->
+		<div id="chat" class="w-full overflow-y-auto p-4 space-y-4"></div>
 
-	  <!-- Área central com logo e input -->
-	  <div class="flex-1 flex flex-col justify-center items-center p-8 gap-8">
-
+		<!-- Área do input com mensagem de boas-vindas -->
+		<div id="input-area" class="flex flex-col items-center p-4 gap-4">
 		<!-- Logo + Mensagem de Boas-Vindas -->
-		<div class="flex flex-col items-center gap-2 text-center opacity-90">
-		  <!-- Substitua pelo SEU LOGO (pode ser um emoji, SVG ou img) -->
-		  <div class="text-6xl mb-2">
-			<img src="/assets/furiaLogo.png" alt="Logo FURIA" class="w-20 h-20">
-		  </div>
-		  <h2 class="text-2xl font-bold">Hi, I'm FuríaBot</h2>
-		  <p class="text-gray-400 max-w-md">
+		<div id="welcome-section" class="flex flex-col items-center gap-2 text-center opacity-90">
+			<div class="text-6xl mb-2">
+			<img src="/assets/furiaLogo.png" alt="Logo FURIA" class="w-20 h-20"/>
+			</div>
+			<h2 class="text-2xl font-bold">Hi, I'm FuríaBot</h2>
+			<p class="text-gray-400 max-w-md">
 			How can I help you today?
-		  </p>
+			</p>
 		</div>
 
 		<!-- Formulário de input -->
-		<form id="chat-form" class="w-full max-w-[70%] flex flex-col gap-2">
-		  <input
+		<form id="chat-form" class="w-full max-w-[70%] mx-auto flex flex-col gap-2 px-4">
+			<input
 			id="message-input"
 			type="text"
 			placeholder="Type your message here..."
-			class="w-full p-4 rounded-lg border border-stone-500 bg-neutral-600/40 text-white outline-none"
-		  />
+			class="w-full p-4 rounded-2xl border border-stone-500 bg-neutral-600/40 text-white outline-none"
+			/>
 		</form>
-	  </div>
-
 	</div>
-  </body>
 
-  <!-- Script para simular envio -->
-  <script>
-    const form = document.getElementById('chat-form');
-    const input = document.getElementById('message-input');
-    const chat = document.getElementById('chat');
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const message = input.value.trim();
-      if (message === '') return;
-
-      const userMsg = document.createElement('div');
-      userMsg.className = 'self-end max-w-xs bg-blue-600 p-3 rounded-xl';
-      userMsg.textContent = message;
-      chat.appendChild(userMsg);
-
-      input.value = '';
-      chat.scrollTop = chat.scrollHeight;
-
-      // Simular resposta do bot
-      setTimeout(() => {
-        const botMsg = document.createElement('div');
-        botMsg.className = 'self-start max-w-xs bg-gray-700 p-3 rounded-xl';
-        botMsg.textContent = 'FURIABOT está pensando...';
-        chat.appendChild(botMsg);
-        chat.scrollTop = chat.scrollHeight;
-      }, 1000);
-    });
-  </script>
+	<script src="main.js"></script>
 </body>
 </html>
