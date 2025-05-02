@@ -1,0 +1,4 @@
+.env
+**/*.pyc
+credencials/
+furia-firebase-admin.json
