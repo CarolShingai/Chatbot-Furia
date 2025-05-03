@@ -1,9 +1,6 @@
 import os
 import requests
-from datetime import datetime
-from dotenv import load_dotenv
-
-# load_dotenv()
+from datetime import datetime, timedelta, timezone
 
 class FuriaTeamInfo:
     def __init__(self):
@@ -11,27 +8,29 @@ class FuriaTeamInfo:
         self.base_url = "https://api.pandascore.co"
         self.team_id = None
         self.players = []
+        self.game = "csgo"
 
     def make_request(self, endpoint, params=None):
+        headers = {"Authorization": f"Bearer {self.token}"}
         if params is None:
             params = {}
-        params["token"] = self.token
-        url = f"{self.base_url}/{endpoint}"
         try:
-            response = requests.get(url, params=params)
-            if response.status_code == 200:
-                return response.json()
-            else:
-                print(f"Erro na requisição: {response.status_code}")
-                print(response.text)
+            url = f"{self.base_url}/{self.game}/{endpoint.lstrip('/')}"
+            print(f"Debug - Requisitando: {url}")  # Log para debug
+            print(f"Debug - Parâmetros: {params}")  # Log para debug
+            response = requests.get(url, params=params, headers=headers, timeout=10)
+
+            if response.status_code != 200:
+                print(f"Erro {response.status_code}: {response.text}")
                 return None
+            return response.json()
         except Exception as e:
-            print(f"Erro de conexão: {str(e)}")
+            print(f"Erro na requisição: {str(e)}")
             return None
 
     def get_team_furia_id(self):
         params = {"filter[slug]": "furia"}
-        team_data = self.make_request("csgo/teams", params)
+        team_data = self.make_request("teams", params)
         if team_data and len(team_data) > 0:
             self.team_id = team_data[0]["id"]
             if "players" in team_data[0]:
@@ -45,37 +44,47 @@ class FuriaTeamInfo:
             self.get_team_furia_id()
         return self.players
 
-    def get_upcomin_matches(self, limit=5):
-        params = {
-            "filter[opponent_id]": self.team_id,
-            "per_page": limit
-            }
+    def get_upcoming_matches(self, limit=5):
         if not self.team_id:
             self.get_team_furia_id()
-        return self.make_request("csgo/matches/upcoming", params)
-
-    def get_past_matches(self, page=1, per_page=10):
         params = {
             "filter[opponent_id]": self.team_id,
-            "page": page,
-            "per_page": per_page,
-            "sort": "begin_at"
+            "sort": "begin_at",
+            "page[size]": limit
         }
-        if not self.team_id:
-            self.get_team_furia_id()
-        return self.make_request("csgo/matches/past", params)
+        return self.make_request("matches/upcoming", params)
 
-    def get_live_matches(self):
-        params = {"filter[opponent_id]": self.team_id}
+    def get_all_past_matches(self, days=90, max_pages=5):
+        all_matches = []
+        for page in range(1, max_pages + 1):
+            matches = self.get_past_matches(days=days, page=page)
+            if not matches:
+                break
+            all_matches.extend(matches)
+            if len(matches) < 100:
+                break
+        return all_matches
+
+    def get_past_matches(self, days=30, page=1, per_page=100):
         if not self.team_id:
             self.get_team_furia_id()
-        return self.make_request("csgo/matches/running", params)
+        params = {
+            "filter[opponent_id]": self.team_id,
+            "sort": "-begin_at",
+            "page[size]": per_page,
+            "page[number]": page
+        }
+        return self.make_request("matches/past", params)
 
     def get_player_stats(self, player_id):
         return self.make_request(f"csgo/players/{player_id}/stats")
 
-    def get_tournamet_results(self, tournament_id):
-        params = {"filter[team_id]": self.team_id}
+    def get_tournament_results(self, tournament_id):
         if not self.team_id:
             self.get_team_furia_id()
-        return self.make_request("csgo/tournaments/{tournament_id}/matches", params)
+        params = {
+            "filter[team_id]": self.team_id,
+            "sort": "-begin_at"
+        }
+        return self.make_request(f"csgo/tournaments/{tournament_id}/matches", params)
+

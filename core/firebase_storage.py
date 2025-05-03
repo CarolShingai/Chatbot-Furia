@@ -30,3 +30,4 @@ def save_tournament_results_to_firebase(matches, tournament_id):
     for match in matches:
         match_id_str = str(match["id"])
         tournaments_collection.document(match_id_str).set(match)
+        
