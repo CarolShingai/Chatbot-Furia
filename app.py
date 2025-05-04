@@ -21,6 +21,7 @@ open_message = [
 ]
 
 initialize_furia_data()
+initialize_furia_data("furia-fe")
 conversations = load_conversations()
 conversation = create_new_conversation()
 

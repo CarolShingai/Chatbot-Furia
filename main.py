@@ -3,6 +3,7 @@ from core.chatbot import send_message
 from core.chat_storage import (
     load_conversations, save_conversation, create_new_conversation, add_message)
 from core.firebase_fetch_data import initialize_furia_data
+from core.furia_team_info import FuriaTeamInfo
 
 def choose_conversation(conversations):
     if not conversations:
@@ -16,6 +17,41 @@ def choose_conversation(conversations):
         return conversations[int(choice)]
     else:
         return create_new_conversation()
+
+# def debug_urls():
+#     api = FuriaTeamInfo()
+
+#     # 1. Testando endpoint de matches (principal causa dos 404)
+#     print("\nTestando endpoints de partidas:")
+#     test_endpoints = [
+#         "matches/upcoming",                     # Seu endpoint atualoi
+#         "matches/running",                      # Possível alternativa
+#         "matches?filter[status]=not_started",   # Versão com query
+#         "v2/matches/upcoming",                 # Testando com versão
+#         "csgo/matches/upcoming"                # Testando com jogo no path
+#     ]
+
+#     for endpoint in test_endpoints:
+#         print(f"\nTestando: {endpoint}")
+#         response = api.make_request(endpoint)
+#         print(f"Status: {getattr(response, 'status_code', 'No response')}")
+#         print(f"Resposta: {response if response else 'Erro'}")
+
+#     # 2. Testando endpoint de estatísticas de jogadores
+#     print("\nTestando endpoints de estatísticas:")
+#     player_id = 17497  # ID do FalleN para teste
+#     stat_endpoints = [
+#         f"players/{player_id}/stats",          # Seu endpoint atual
+#         f"players/{player_id}/statistics",     # Possível alternativa
+#         f"v2/players/{player_id}/stats",       # Com versão
+#         f"csgo/players/{player_id}/stats"      # Com jogo no path
+#     ]
+
+#     for endpoint in stat_endpoints:
+#         print(f"\nTestando: {endpoint}")
+#         response = api.make_request(endpoint)
+#         print(f"Status: {getattr(response, 'status_code', 'No response')}")
+#         print(f"Resposta: {response if response else 'Erro'}")
 
 def detect_game_from_input(text):
     text_lower = text.lower()
@@ -37,6 +73,7 @@ def handle_exit(input_lower, conversation, conversations):
 
 def main():
     initialize_furia_data()
+    initialize_furia_data("furia-fe")
     conversations = load_conversations()
     conversation = choose_conversation(conversations)
     print("Bem-vindo ao FURIABOT! Digite 'sair' para encerrar.\n")

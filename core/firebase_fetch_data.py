@@ -1,15 +1,15 @@
 from core.config.firebase_config import db
 from core.furia_team_info import FuriaTeamInfo
 from core.firebase_storage import (
-    save_team_to_firebase, save_players_to_firebase, save_player_stats_to_firebase, 
+    save_team_to_firebase, save_players_to_firebase, save_player_stats_to_firebase,
     save_matches_to_firebase)
 from datetime import datetime, timedelta, timezone
 
-def load_furia_data_from_firebase():
-    furia_doc = db.collection("teams").document("furia").get()
-    players_ref = db.collection("teams").document("furia").collection("players")
-    upcoming_ref = db.collection("teams").document("furia").collection("upcoming_matches")
-    past_ref = db.collection("teams").document("furia").collection("past_matches")
+def load_furia_data_from_firebase(slug="furia"):
+    furia_doc = db.collection("teams").document(slug).get()
+    players_ref = db.collection("teams").document(slug).collection("players")
+    upcoming_ref = db.collection("teams").document(slug).collection("upcoming_matches")
+    past_ref = db.collection("teams").document(slug).collection("past_matches")
 
     furia_info = furia_doc.to_dict() if furia_doc.exists else {}
     players_list = [p.to_dict() for p in players_ref.stream()]
@@ -17,49 +17,59 @@ def load_furia_data_from_firebase():
     past_matches = [m.to_dict() for m in past_ref.stream()]
     return furia_info, players_list, upcoming_matches, past_matches
 
-def initialize_furia_data():
-    furia_info, players, upcoming, past = load_furia_data_from_firebase()
-    furia_api = FuriaTeamInfo()
+    """Carrega dados do time feminino da FURIA do Firebase"""
+def load_furia_fe_data_from_firebase():
+    doc_ref = db.collection('teams').document('furia-fe')
+    doc = doc_ref.get()
+    if not doc.exists:
+        return {}, [], [], []
+    data = doc.to_dict()
+    furia_fe_info = data.get("info", {})
+    fe_players = data.get("players", [])
+    fe_upcoming_matches = data.get("upcoming_matches", [])
+    fe_past_matches = data.get("past_matches", [])
+    return furia_fe_info, fe_players, fe_upcoming_matches, fe_past_matches
+
+
+
+def initialize_furia_data(slug="furia"):
+    furia_info, players, upcoming, past = load_furia_data_from_firebase(slug)
+    furia_api = FuriaTeamInfo(slug=slug)
     if not furia_info:
-        furia_info = fetch_and_save_team_data(furia_api)
+        furia_info = fetch_and_save_team_data(furia_api, slug)
     if not players:
-        players = fetch_and_save_players_data(furia_api)
-    upcoming, past = fetch_and_save_matches_data(furia_api)
+        players = fetch_and_save_players_data(furia_api, slug)
+    if not upcoming or not past:
+        upcoming, past = fetch_and_save_matches_data(furia_api, slug)
     return furia_info, players, upcoming, past
 
-def fetch_and_save_team_data(furia_api):
+def fetch_and_save_team_data(furia_api, slug):
     team_data = furia_api.get_team_furia_id()
     if team_data:
-        save_team_to_firebase(team_data)
+        save_team_to_firebase(team_data, slug)
         return team_data[0]
     return {}
 
-def fetch_and_save_players_data(furia_api):
+def fetch_and_save_players_data(furia_api, slug):
     players_data = furia_api.get_furia_players()
     if players_data:
-        save_players_to_firebase(players_data)
-        for player in players_data:
-            stats = furia_api.get_player_stats(player["id"])
-            if stats:
-                save_player_stats_to_firebase(stats, player["id"])
+        save_players_to_firebase(players_data, slug)
         return players_data
     return []
 
-def fetch_and_save_matches_data(furia_api):
+def fetch_and_save_matches_data(furia_api, slug):
     upcoming_matches = furia_api.get_upcoming_matches()
     past_matches_raw = furia_api.get_all_past_matches()
-    print(f"\nDebug - Partidas passadas brutas: {len(past_matches_raw)}")
     past_matches = filter_recent_matches(past_matches_raw, max_days_old=90)
-    print(f"Debug - Partidas após filtro: {len(past_matches)}")
     if past_matches:
         print(f"Exemplo de partida recente: {past_matches[0].get('begin_at')}")
-        save_matches_to_firebase(past_matches, "past_matches")
+        save_matches_to_firebase(past_matches, slug, "past_matches")
     else:
-        print("Nenhuma partida recente para salvar") 
+        print("Nenhuma partida recente para salvar")
     if upcoming_matches:
-        save_matches_to_firebase(upcoming_matches, "upcoming_matches")
+        save_matches_to_firebase(upcoming_matches, slug, "upcoming_matches")
     if past_matches:
-        save_matches_to_firebase(past_matches, "past_matches")
+        save_matches_to_firebase(past_matches, slug, "past_matches")
     return upcoming_matches, past_matches
 
 from datetime import datetime, timedelta, timezone
@@ -71,8 +81,8 @@ def filter_recent_matches(matches: list, max_days_old: int = 90) -> list:
     recent_matches = []
     for match in matches:
         try:
-            date_str = (match.get('begin_at') or 
-                       match.get('scheduled_at') or 
+            date_str = (match.get('begin_at') or
+                       match.get('scheduled_at') or
                        match.get('original_scheduled_at'))
             if not date_str:
                 continue

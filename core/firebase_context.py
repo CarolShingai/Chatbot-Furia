@@ -1,4 +1,4 @@
-from core.firebase_fetch_data import load_furia_data_from_firebase
+from core.firebase_fetch_data import load_furia_data_from_firebase, load_furia_fe_data_from_firebase
 from datetime import datetime
 
 def build_team_section(furia_info: dict) -> str:
@@ -25,9 +25,9 @@ def build_matches_section(matches: list, title: str, emoji: str, result_emoji: s
         return ""
     section = f"{emoji} **{title}:**\n"
     for match in matches[:3]:
-        opponents = [t.get('name', 'Adversário') for t in match.get('opponents', [])]
+        opponents = [t.get('opponent', 'Adversário').get('acronym', 'adversário') for t in match.get('opponents', [])]
         line = f"- {result_emoji} " if result_emoji else "- "
-        line += f"vs {', '.join(opponents)}"
+        line += f"{' vs '.join(opponents)}"
         if 'scheduled_at' in match:
             line += f" 🗓️ {match['scheduled_at']}"
         elif 'begin_at' in match:
@@ -35,21 +35,40 @@ def build_matches_section(matches: list, title: str, emoji: str, result_emoji: s
         section += line + "\n"
     return section + "\n"
 
-def build_context_from_firebase() -> str:
-    furia_info, players, upcoming_matches, past_matches, live_matches = load_furia_data_from_firebase()
-    context = "🔹 **Informações da FURIA Esports** 🔹\n\n"
-    context += build_team_section(furia_info)
+def build_full_team_context(info, players, upcoming_matches, past_matches, live_matches=None, title="FURIA", emoji="🔹"):
+    context = f"{emoji} **{title}** {emoji}\n\n"
+    context += build_team_section(info)
     context += build_players_section(players)
     context += build_matches_section(upcoming_matches, "Próximos Jogos", "⏳")
-    context += build_matches_section(live_matches, "JOGOS AO VIVO", "🔥")
+    print(f"Info: {info}")
+    if live_matches:
+        context += build_matches_section(live_matches, "JOGOS AO VIVO", "🔥")
     if past_matches:
         context += "📊 **Últimos Resultados:**\n"
         for match in past_matches[:3]:
-            opponents = match.get('opponents', [])
-            if isinstance(opponents, list):
-                opponents = [opponent.get('name', 'Desconhecido') for opponent in opponents]
-            else:
-                opponents = []
-            result = "✅" if match.get('winner_id') == furia_info.get('id') else "❌"
-            context += f"- {result} vs {', '.join(opponents)} 📅 {match.get('begin_at', '')}\n"
+            opponents = [o.get("opponent", "Desconhecido").get("acronym", "Desconhecido") for o in match.get("opponents", [])]
+            result = "✅" if match.get("winner_id") == info.get("id") else "❌"
+            context += f"- {result} {' vs '.join(opponents)} 📅 {match.get('begin_at', '')}\n"
+    return context + "\n"
+
+def build_context_from_firebase(include_furia_fe=True) -> str:
+    furia_info, players, upcoming_matches, past_matches = load_furia_data_from_firebase()
+    context = build_full_team_context(
+        info=furia_info,
+        players=players,
+        upcoming_matches=upcoming_matches,
+        past_matches=past_matches,
+        title="FURIA (CS:GO Masculino)",
+        emoji="🔹"
+    )
+    if include_furia_fe:
+        fe_info, fe_players, fe_upcoming_matches, fe_past_matches = load_furia_fe_data_from_firebase()
+        context += build_full_team_context(
+            info=fe_info,
+            players=fe_players,
+            upcoming_matches=fe_upcoming_matches,
+            past_matches=fe_past_matches,
+            title="FURIA FE (CS:GO Feminino)",
+            emoji="🌸"
+        )
     return context

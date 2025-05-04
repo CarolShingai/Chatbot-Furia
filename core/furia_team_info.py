@@ -3,12 +3,13 @@ import requests
 from datetime import datetime, timedelta, timezone
 
 class FuriaTeamInfo:
-    def __init__(self):
+    def __init__(self, slug="furia", game="csgo"):
+        self.slug = slug
         self.token = os.environ.get("PANDASCORE_KEY")
         self.base_url = "https://api.pandascore.co"
         self.team_id = None
         self.players = []
-        self.game = "csgo"
+        self.game = game
 
     def make_request(self, endpoint, params=None):
         headers = {"Authorization": f"Bearer {self.token}"}
@@ -16,8 +17,7 @@ class FuriaTeamInfo:
             params = {}
         try:
             url = f"{self.base_url}/{self.game}/{endpoint.lstrip('/')}"
-            print(f"Debug - Requisitando: {url}")  # Log para debug
-            print(f"Debug - Parâmetros: {params}")  # Log para debug
+            print(f"Carregando informações de url: {url}")
             response = requests.get(url, params=params, headers=headers, timeout=10)
 
             if response.status_code != 200:
@@ -30,6 +30,8 @@ class FuriaTeamInfo:
 
     def get_team_furia_id(self):
         params = {"filter[slug]": "furia"}
+        if self.slug == "furia-fe":
+            params = {"filter[slug]": f"{self.slug}"}
         team_data = self.make_request("teams", params)
         if team_data and len(team_data) > 0:
             self.team_id = team_data[0]["id"]
@@ -87,4 +89,3 @@ class FuriaTeamInfo:
             "sort": "-begin_at"
         }
         return self.make_request(f"csgo/tournaments/{tournament_id}/matches", params)
-
