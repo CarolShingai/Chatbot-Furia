@@ -1,11 +1,23 @@
-from core.games import GAME_SLUGS
 from core.chatbot import send_message
 from core.chat_storage import (
     load_conversations, save_conversation, create_new_conversation, add_message)
 from core.firebase_fetch_data import initialize_furia_data
-from core.furia_team_info import FuriaTeamInfo
 
 def choose_conversation(conversations):
+    """
+    Permite ao usuário selecionar uma conversa existente ou criar uma nova.
+    
+    Args:
+        conversations (list): Lista de conversas disponíveis
+        
+    Returns:
+        dict: A conversa selecionada ou uma nova conversa
+        
+    Behavior:
+        - Se não houver conversas, cria e retorna uma nova
+        - Lista todas as conversas com data e quantidade de mensagens
+        - Permite ao usuário escolher pelo índice ou criar nova
+    """
     if not conversations:
         print("Nenhuma conversa salva. Criando uma nova.\n")
         return create_new_conversation()
@@ -18,49 +30,22 @@ def choose_conversation(conversations):
     else:
         return create_new_conversation()
 
-# def debug_urls():
-#     api = FuriaTeamInfo()
-
-#     # 1. Testando endpoint de matches (principal causa dos 404)
-#     print("\nTestando endpoints de partidas:")
-#     test_endpoints = [
-#         "matches/upcoming",                     # Seu endpoint atualoi
-#         "matches/running",                      # Possível alternativa
-#         "matches?filter[status]=not_started",   # Versão com query
-#         "v2/matches/upcoming",                 # Testando com versão
-#         "csgo/matches/upcoming"                # Testando com jogo no path
-#     ]
-
-#     for endpoint in test_endpoints:
-#         print(f"\nTestando: {endpoint}")
-#         response = api.make_request(endpoint)
-#         print(f"Status: {getattr(response, 'status_code', 'No response')}")
-#         print(f"Resposta: {response if response else 'Erro'}")
-
-#     # 2. Testando endpoint de estatísticas de jogadores
-#     print("\nTestando endpoints de estatísticas:")
-#     player_id = 17497  # ID do FalleN para teste
-#     stat_endpoints = [
-#         f"players/{player_id}/stats",          # Seu endpoint atual
-#         f"players/{player_id}/statistics",     # Possível alternativa
-#         f"v2/players/{player_id}/stats",       # Com versão
-#         f"csgo/players/{player_id}/stats"      # Com jogo no path
-#     ]
-
-#     for endpoint in stat_endpoints:
-#         print(f"\nTestando: {endpoint}")
-#         response = api.make_request(endpoint)
-#         print(f"Status: {getattr(response, 'status_code', 'No response')}")
-#         print(f"Resposta: {response if response else 'Erro'}")
-
-def detect_game_from_input(text):
-    text_lower = text.lower()
-    for name, slug in GAME_SLUGS.items():
-        if name in text_lower:
-            return slug
-    return None
-
 def handle_exit(input_lower, conversation, conversations):
+    """
+    Verifica e trata o comando de saída do usuário.
+    
+    Args:
+        input_lower (str): Input do usuário em minúsculas
+        conversation (dict): Conversa atual
+        conversations (list): Lista de todas as conversas
+        
+    Returns:
+        bool: True se foi um comando de saída, False caso contrário
+        
+    Side Effects:
+        - Salva a conversa atual se o comando for 'sair'
+        - Atualiza conversa existente ou adiciona nova à lista
+    """
     if input_lower == "sair":
         existing = [c for c in conversations if c["id"] == conversation["id"]]
         if existing:
@@ -72,6 +57,22 @@ def handle_exit(input_lower, conversation, conversations):
     return False
 
 def main():
+    """
+    Função principal que gerencia o fluxo do chatbot FURIABOT.
+    
+    Fluxo de operação:
+    1. Inicializa dados da FURIA (masculino e feminino)
+    2. Carrega conversas existentes
+    3. Permite selecionar ou criar conversa
+    4. Inicia loop de interação:
+       - Recebe input do usuário
+       - Verifica comando de saída
+       - Gera resposta do chatbot
+       - Armazena mensagens no histórico
+       
+    Comportamento de saída:
+    - Digitar 'sair' encerra o programa e salva a conversa
+    """
     initialize_furia_data()
     initialize_furia_data("furia-fe")
     conversations = load_conversations()

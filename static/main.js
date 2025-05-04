@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
     chat: document.getElementById('chat'),
     welcomeSection: document.getElementById('welcome-section'),
     welcomeMessage: document.getElementById('welcome-message'),
-    mainContainer: document.querySelector('.flex-1.flex.flex-col')
+    mainContainer: document.querySelector('.flex-1.flex.flex-col'),
+    loadingIndicator: document.getElementById('loading-indicator')
   };
 
   // Configurações
@@ -114,6 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
     appendMessage(createUserMessage(message));
     DOM.input.value = '';
 
+    DOM.loadingIndicator.classList.remove('hidden');
     fetch("/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -127,6 +129,9 @@ document.addEventListener('DOMContentLoaded', function() {
       .catch(error => {
         console.error("Erro ao enviar mensagem:", error);
         appendMessage(createBotResponse("⚠️ Ocorreu um erro ao falar com o FURIABOT."));
+      })
+      .finally(() => {
+        DOM.loadingIndicator.classList.add('hidden');
       });
   }
 

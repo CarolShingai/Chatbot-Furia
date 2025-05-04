@@ -6,6 +6,19 @@ from core.firebase_storage import (
 from datetime import datetime, timedelta, timezone
 
 def load_furia_data_from_firebase(slug="furia"):
+    """
+    Carrega dados do time FURIA do Firebase Firestore.
+
+    Args:
+        slug (str): Identificador do time no Firestore (padrão: "furia").
+
+    Returns:
+        tuple: Um tupla contendo:
+            - dict: Informações gerais do time.
+            - list: Lista de jogadores.
+            - list: Lista de próximas partidas.
+            - list: Lista de partidas passadas.
+    """
     furia_doc = db.collection("teams").document(slug).get()
     players_ref = db.collection("teams").document(slug).collection("players")
     upcoming_ref = db.collection("teams").document(slug).collection("upcoming_matches")
@@ -17,8 +30,17 @@ def load_furia_data_from_firebase(slug="furia"):
     past_matches = [m.to_dict() for m in past_ref.stream()]
     return furia_info, players_list, upcoming_matches, past_matches
 
-    """Carrega dados do time feminino da FURIA do Firebase"""
 def load_furia_fe_data_from_firebase():
+    """
+    Carrega dados do time feminino da FURIA do Firebase Firestore.
+
+    Returns:
+        tuple: Uma tupla contendo:
+            - dict: Informações gerais do time feminino.
+            - list: Lista de jogadoras.
+            - list: Lista de próximas partidas.
+            - list: Lista de partidas passadas.
+    """
     doc_ref = db.collection('teams').document('furia-fe')
     doc = doc_ref.get()
     if not doc.exists:
@@ -33,6 +55,16 @@ def load_furia_fe_data_from_firebase():
 
 
 def initialize_furia_data(slug="furia"):
+    """
+    Inicializa os dados da equipe FURIA, buscando no Firebase ou, se necessário,
+    atualizando com dados da API da PandaScore.
+
+    Args:
+        slug (str): Identificador do time (padrão: "furia").
+
+    Returns:
+        tuple: Dados atualizados do time, jogadores, próximas e passadas partidas.
+    """
     furia_info, players, upcoming, past = load_furia_data_from_firebase(slug)
     furia_api = FuriaTeamInfo(slug=slug)
     if not furia_info:
@@ -44,6 +76,16 @@ def initialize_furia_data(slug="furia"):
     return furia_info, players, upcoming, past
 
 def fetch_and_save_team_data(furia_api, slug):
+    """
+    Busca os dados do time FURIA na API e salva no Firebase.
+
+    Args:
+        furia_api (FuriaTeamInfo): Instância da classe de acesso à API.
+        slug (str): Identificador da equipe no banco.
+
+    Returns:
+        dict: Dados do time retornados pela API.
+    """
     team_data = furia_api.get_team_furia_id()
     if team_data:
         save_team_to_firebase(team_data, slug)
@@ -51,6 +93,16 @@ def fetch_and_save_team_data(furia_api, slug):
     return {}
 
 def fetch_and_save_players_data(furia_api, slug):
+    """
+    Busca os dados dos jogadores da FURIA na API e salva no Firebase.
+
+    Args:
+        furia_api (FuriaTeamInfo): Instância da classe de acesso à API.
+        slug (str): Identificador da equipe no banco.
+
+    Returns:
+        list: Lista de jogadores.
+    """
     players_data = furia_api.get_furia_players()
     if players_data:
         save_players_to_firebase(players_data, slug)
@@ -58,6 +110,16 @@ def fetch_and_save_players_data(furia_api, slug):
     return []
 
 def fetch_and_save_matches_data(furia_api, slug):
+    """
+    Busca e salva partidas (próximas e passadas) da FURIA na API e no Firebase.
+
+    Args:
+        furia_api (FuriaTeamInfo): Instância da classe de acesso à API.
+        slug (str): Identificador da equipe no banco.
+
+    Returns:
+        tuple: Próximas partidas e partidas passadas (ambas listas).
+    """
     upcoming_matches = furia_api.get_upcoming_matches()
     past_matches_raw = furia_api.get_all_past_matches()
     past_matches = filter_recent_matches(past_matches_raw, max_days_old=90)
@@ -72,9 +134,17 @@ def fetch_and_save_matches_data(furia_api, slug):
         save_matches_to_firebase(past_matches, slug, "past_matches")
     return upcoming_matches, past_matches
 
-from datetime import datetime, timedelta, timezone
-
 def filter_recent_matches(matches: list, max_days_old: int = 90) -> list:
+    """
+    Filtra as partidas para manter apenas as ocorridas nos últimos N dias.
+
+    Args:
+        matches (list): Lista de partidas (dicts).
+        max_days_old (int): Número máximo de dias passados (padrão: 90).
+
+    Returns:
+        list: Partidas filtradas.
+    """
     if not matches:
         return []
     cutoff_date = datetime.now(timezone.utc) - timedelta(days=max_days_old)
@@ -96,9 +166,14 @@ def filter_recent_matches(matches: list, max_days_old: int = 90) -> list:
             continue
     return recent_matches
 
-from core.config.firebase_config import db
-
 def clean_old_matches():
+    """
+    Remove do Firebase as partidas passadas da FURIA com mais de 90 dias.
+
+    Side Effects:
+        Deleta documentos antigos no Firestore.
+        Imprime o número de partidas removidas.
+    """
     try:
         past_ref = db.collection("teams").document("furia").collection("past_matches")
         cutoff = datetime.now(timezone.utc) - timedelta(days=90)
