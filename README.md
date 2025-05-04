@@ -81,3 +81,11 @@ Abra o navegador e vá para `http://127.0.0.1:5000`
 - 🕹️ Histórico de partidas passadas com resultados
 - 🖥️ Interface responsiva feita com Tailwind CSS
 - 🛒 Link para a loja oficial da FURIA.
+
+## Resultado:
+<p align="center">
+<img src="chatbot_furia.gif" width="800px" alt="Chatbot FURIA"/><br>
+</p>
+
+## Autor
+Desenvolvido por [Caroline Shingai](https://github.com/CarolShingai)
