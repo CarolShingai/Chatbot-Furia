@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='furiaLogo.png') }}">
   <title>FURIABOT</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -11,10 +12,9 @@
 		<div class="flex items-center gap-3">
 			<img src="{{ url_for('static', filename='furiaLogo.png') }}" alt="Logo FURIA"
 			   class="w-8 h-8 hover:scale-110 transition-transform">
-			<h1 class="text-2xl font-bold text-white">FURIABOT</h1>
+			<h1 class="text-2xl: font-bold text-white">FURIABOT</h1>
 		</div>
 		<div class="mt-8">
-		  <!-- Itens adicionais podem ser colocados aqui -->
 		</div>
 	</header>
 
@@ -39,14 +39,12 @@
 					<input
 					id="message-input"
 					type="text"
-					placeholder="Type your message here..."
+					placeholder="Escreva sua mensagem aqui..."
 					class="w-full p-4 rounded-2xl border border-stone-500 bg-neutral-600/40 text-white outline-none"
 					/>
 				</form>
 		</div>
 	</main>
-
-
 	<script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
 </html>
