@@ -1,6 +1,6 @@
 # 🤖💻  Chatbot-FURIA
 
-Um chatbot esportivo focado em esports que traz informações sobre a equipe FURIA de CS:GO, integrando dados da PandaScore API, IA generativa com Groq, e persistência de histórico via Firebase. O backend é construído com Flask, e o frontend com Tailwind CSS e JavaScript.
+Um chatbot esportivo focado em eSports que fornece informações detalhadas sobre a equipe FURIA de CS:GO. Ele utiliza a PandaScore API para coletar dados em tempo real, que são armazenados no Firebase para consulta e histórico. A inteligência das respostas é gerada por um modelo LLaMA3 via Groq API. O backend é construído com Flask e a interface é desenvolvida com Tailwind CSS e JavaScript.
 
 ## 📦 Tecnologias Utilizadas
 
