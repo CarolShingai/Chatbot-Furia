@@ -87,5 +87,5 @@ Abra o navegador e vá para `http://127.0.0.1:5000`
 <img src="chatbot_furia.gif" width="800px" alt="Chatbot FURIA"/><br>
 </p>
 
-## Autor
-Desenvolvido por [Caroline Shingai](https://github.com/CarolShingai)
+## Sobre a Autora
+Esse projeto foi desenvolvido por [Carol Shingai](https://github.com/CarolShingai),  entusiasta de games, tecnologia e inteligência artificial. Criar este chatbot foi uma jornada desafiadora e extremamente enriquecedora. Ao longo do processo, me aventurei com tecnologias que nunca havia utilizado antes — enfrentando erros, aprendendo na prática e evoluindo a cada etapa. Mais do que um exercício técnico, foi uma experiência real de aprendizado, na qual pude aplicar conceitos importante e, ao fim, obter um resultado o qual me deixou verdadeiramente satisfeita.
