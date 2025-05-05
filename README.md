@@ -62,7 +62,7 @@ Para que o chatbot funcione corretamente, você precisa obter e configurar três
 3. Crie um projeto novo.
 4. Vá em "Configurações do Projeto" > "Contas de Serviço".
 5. Gere uma nova chave privada JSON.
-6. Na raiz do projeto cria a pasta **"credentials"**
+6. Na raiz do projeto crie a pasta **"credentials"**
 7. Salve o arquivo e adicione na pasta **"credentials"**
 
 ### 5 - Inicie o servidor Flask:
