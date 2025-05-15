@@ -34,8 +34,8 @@ pip install -r requirements.txt
 
 ### 4 - Configure suas variáveis de ambiente:
 ```bash
-**GROP_KEY**=your_groq_key
-**PANDASCORE_KEY**=your_pandascore_key 
+GROP_KEY="your_groq_key"
+PANDASCORE_KEY="your_pandascore_key"
 ```
 ## 🔐 Como obter as chaves de API
 Para que o chatbot funcione corretamente, você precisa obter e configurar três chaves:
@@ -45,7 +45,7 @@ Para que o chatbot funcione corretamente, você precisa obter e configurar três
 3. Crie um novo projeto e copie sua API Key.
 4. Adicione ao .env
 ```bash
-**GROQ_KEY**=your_groq_api_key
+GROQ_KEY="your_groq_api_key"
 ```
 #### 🎮 PandaScore API
 1. Acesse: https://www.pandascore.co/
@@ -53,7 +53,7 @@ Para que o chatbot funcione corretamente, você precisa obter e configurar três
 3. Vá em "My API Keys" no painel e gere uma nova.
 4. Adicione ao .env
 ```bash
-**PANDASCORE_KEY**=your_pandascore_key 
+PANDASCORE_KEY="your_pandascore_key" 
 ```
 
 #### ☁️ Firebase
